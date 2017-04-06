@@ -1,11 +1,11 @@
 {
-  "name": "itc230",
+  "name": "homework1",
   "version": "1.0.0",
-  "description": "adv js stuff",
+  "description": "This is my first homwork from itc230.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "elvira",
+  "author": "Elvira Davison",
   "license": "ISC"
 }
