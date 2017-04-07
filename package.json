@@ -1,11 +1,20 @@
 {
-  "name": "homework1",
+  "name": "itc230",
   "version": "1.0.0",
-  "description": "This is my first homwork from itc230.",
+  "description": "adv js stuff",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Elvira Davison",
-  "license": "ISC"
+  "author": "elvira",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Entert7ainment/itc230.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/Entert7ainment/itc230/issues"
+  },
+  "homepage": "https://github.com/Entert7ainment/itc230#readme"
 }
