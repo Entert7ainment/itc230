@@ -25,9 +25,15 @@ return music.find((item) =>{
 });    
 }
 exports.delete =(title)=>{
-return music.filter((item) =>{
-    return item.title!==title;
-    });  
+    // delete requested title from music array
+    // return success/failure & new total
+    let oldLength = music.length;
+    let newMusic = music.filter((item) =>{
+        return item.title!==title;
+    });
+ music = newMusic;
+    console.log(music);
+    return {delete: music.length !== oldLength, total: music.length};  
 }
 
 //exports. =(title)=>{
