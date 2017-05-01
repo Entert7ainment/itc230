@@ -5,20 +5,6 @@ let music = [
    {title:"going down", author:"royce", pubDate:1976}
 ];
 
-//let get = (title) =>{
-    //return books.find((item) => {
-       // console.log(item);
-       //return item.title == title;
-    //});
-   // return title;
-//}
-//console.log (get("it"));
-//console.log(books[0].title)
-//module.exports ={
-   // get
-//}
-
-
 exports.get =(title)=>{
 return music.find((item) =>{
     return item.title==title;
@@ -32,12 +18,27 @@ exports.delete =(title)=>{
         return item.title!==title;
     });
  music = newMusic;
-    console.log(music);
     return {deleted: music.length !== oldLength, total: music.length};  
 }
+exports.add =(newObject)=>{
+    var added= false;
 
-//exports. =(title)=>{
-//return music.filter((item)=>{
-  //  return item.title==title;
-   // });
-//}
+  // check if song exist.
+  var found = this.get(newObject.title);
+  if (!found) {
+    music.push(newObject);
+    added = true;
+  }
+  // if it is new then add it
+  //respond with information if worked
+      return {added: added, total: music.length};  
+
+}
+
+//console.log(this.add( {title:"Tennessee Whiskey", author:"chris", pubDate:2015}));
+//console.log(this.add( {title:"is", author:"xx2", pubDate:1}));
+
+
+
+
+
