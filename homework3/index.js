@@ -18,14 +18,14 @@ app.get('/', function(req,res){
 });
 
 app.get('/delete', function(req,res){    
-    let result= movies.delete(req.query.title); 
+    let result= music.delete(req.query.title); 
     console.log(result.totalremain);
     res.render('delete', {title: req.query.title, result: result});   
 });
 
 app.post('/get', function(req,res){
     let header = 'Searching for the movie: ' + req.body.title;
-    let found = movies.get(req.body.title);
+    let found = music.get(req.body.title);
     res.render('details', {title: req.body.title, result: found, pageheader: header});
 });
 
