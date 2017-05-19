@@ -1,10 +1,10 @@
-
 'use strict'
  
 const express = require("express");
 const app = express();
 
-var lyric=require("./lyric/music");
+//var lyric=require("./lyric/music");
+var Lyric =require("./models/music");
 
 app.set('port', process.env.PORT || 3000);
 app.use(express.static(__dirname + '/public')); // set location for static files
@@ -15,45 +15,64 @@ app.engine(".html", handlebars({extname: '.html', defaultLayout:'main'}));
 app.set("view engine", ".html");
 
 // send static file as response
-app.get('/', function(req,res){
+app.get('/', (req,res)=>{
+Lyric.find({},(err, music)=>{
+ if (err) return next(err);
  res.type('text/html');
- let show=lyric.getAll();
- res.render('home',{music:show, title:show.title});
+ //let show=lyric.getAll();
+ res.render('home',{music:music});
+});
 //res.sendFile(__dirname + '/public/home.html'); 
 });
 
 // send plain text response
-app.get('/get', function(req,res){
- res.type('text/plain');
- let header = 'Searching for music:'+ req.query.title;
- let found = lyric.get(req.query.title);
- res.render('details', {title: req.query.title, result: found, pageheader: header});
- //res.send('About page');
+app.get('/get', (req,res)=>{
+    Lyric.findOne({title: req.query.title},(err, music)=>{     
+    if (err) return next(err);                                  
+    res.type('text/html');  
+    res.render('details', {title: req.query.title, result:music,pageheader: 'Searching for music:'+req.query.title});    
+    });      
 });
+ //res.type('text/plain');
+ //let header = 'Searching for music:'+ req.query.title;
+ //let found = lyric.get(req.query.title);
 
-app.get('/about', function(req,res){
+ //res.send('About page');
+
+
+app.get('/about', (req,res)=>{
  res.type('test/html');
  res.render('about');
 });
 
 // send content of 'home' view, //change body to queron let result & res.render
-app.post('/get', function(req,res){
- let header = 'Searching for music' + req.body.title;
- let found =lyric.get(req.body.title);
+app.post('/get', (req,res)=>{
+     Lyric.findOne({title: req.body.title},(err, music)=>{     
+   if (err) return next(err);   
+    res.type('text/html');  
+    res.render('details', {title: req.body.title, result:music,pageheader: 'Searching for music'+req.body.title});    
+    });      
+});
+
+ //let header = 'Searching for music' + req.body.title;
+ //let found =lyric.get(req.body.title);
  
  //let result = lyric.get(req.query.title);
  //res.render('details', {title: req.query.title, result: result });
-});
 
-app.get('/delete', function(req,res){
- let result = lyric.delete(req.query.title);
- //var remove = lyric.delete(req.body.title);
- console.log(result.total);
- res.render('delete', {title: req.body.title, result: result});
-});
 
+app.get('/delete', (req,res)=>{    
+    Lyric.findOneAndRemove({title: req.query.title},(err, music)=>{             
+    if (err) return next(err);                                  
+ Lyric.count({},(err,count)=>{
+   
+    res.type('text/html'); 
+    res.render('delete', {title: req.query.title, result: count});  
+        })  
+            });                             
+    });
 // define 404 handler
-app.use(function(req,res) {
+app.use((req,res) =>{
  res.type('text/plain'); 
  res.status(404);
  res.send('404 - Not found');
