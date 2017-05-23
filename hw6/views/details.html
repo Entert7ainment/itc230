@@ -1,0 +1,15 @@
+<a href="/">Home</a>
+{{#if result}}
+    <header>{{pageheader}}</header>
+    <h2>{{title}} music details</h2>
+    <li>Title: {{result.title}}</li>
+    <li>Author: {{result.author}}</li>
+    <li>pubDate: {{result.pubdate}}</li>
+    <p>
+        <a href ="/">Home</a><br>
+    <a href="/delete?title={{result.title}}">Delete</a>
+    </p>
+{{else}}
+        <h2>{{title}} not found</h2>
+         <a href ="/">Home</a><br>
+{{/if}}
