@@ -4,7 +4,6 @@ let music = [
    {title:"is", author:"davis", pubDate:1974},
    {title:"going down", author:"royce", pubDate:1976},
    {title:"Tennessee Whiskey", author:"chris", pubDate:2015}
-   
 ];
 
 exports.getAll=()=>{

@@ -1,5 +1,5 @@
 var mongoose = require('mongoose');
-var credentials = require("../lyric/credentials");
+var credentials = require("../models/credentials");
 
 
 // connection string for remote database 

@@ -80,12 +80,12 @@ app.get('/api/v1/lyric/:title', (req,res)=>{
     });      
 });
 
-app.get('/api/v1/lyric/add/:title/:author?/:pudDate?', (req,res)=>{
+app.get('/api/v1/lyric/add/:title/:author?/:pubDate?', (req,res)=>{
 console.log(req.params);
 let author = req.params.author || "";
 let pubDate = req.params.pubDate || "";
 
-var lyric=new Lyric({title: req.params.title,author:author,pudDate: pudDate}); 
+var lyric=new Lyric({title: req.params.title,author:author,pubDate: pubDate}); 
 lyric.save(lyric, (err,result)=>{        
        
     if(err)
