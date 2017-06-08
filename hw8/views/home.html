@@ -51,7 +51,11 @@
      
           // Handle item save
       onSave(newItem) {
-        
+      //  if(newItem does not have a title then don't do anything)
+          if(!newItem.title){
+            return
+          }
+          
         fetch("/api/v1/add/", {
           method: "POST",
         	headers: { 'Content-Type': 'application/json' },
