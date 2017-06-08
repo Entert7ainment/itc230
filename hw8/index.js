@@ -2,6 +2,7 @@
  
 const express = require("express");
 const app = express();
+var bodyParser = require("body-parser");
 
 //var lyric=require("./lyric/music");
 var Lyric =require("./models/music");
@@ -9,161 +10,134 @@ var Lyric =require("./models/music");
 app.set('port', process.env.PORT || 3000);
 app.use(express.static(__dirname + '/public')); // set location for static files
 app.use(require("body-parser").urlencoded({extended: true})); // parse form submissions
-
+app.use(bodyParser.json());
 app.use('/api', require('cors')());
+app.use((err, req, res, next) => {
+  console.log(err);
+});
 
 let handlebars =  require("express-handlebars");
 app.engine(".html", handlebars({extname: '.html', defaultLayout:'main'}));
 app.set("view engine", ".html");
 
+app.get('/', (req,res)=>{
+   Lyric.find((err, lyric)=>{
+       if(err) return next(err);
+       res.render('home', {music:JSON.stringify(lyric)});
+   })   
+})
+ 
+app.get('/about', (req,res)=>{
+    res.type('text/html');
+    res.render('about');
+});
+ 
 
-
-//api routes begins
-app.get('/api/v1/lyric', (req,res)=>{
+app.get('/api/v1/lyric', (req,res,next)=>{
     Lyric.find({},(err, lyric)=>{              
     
-    if(lyric)
+    if(err||!lyric)
     {
-        res.json(lyric);
+      return next(err);
     }
     else
     {
-        res.status(404).send('404 Error');
+        res.json(lyric);
     }  
         
     });    
 });
-
-app.post('/api/v1/lyric/:title', (req,res)=>{
-Lyric.findOne({title: req.params.title},(err, lyric)=>{     
-   if(lyric)
+ 
+app.post('/api/v1/lyric/:title', (req,res,next)=>{
+Lyric.findOne({title: req.body.title},(err, lyric)=>{     
+   if(err||!lyric)
    {
-        res.json(lyric);
+        return next(err);
     }
     
     else
     {
-        res.status(404).send('404 Error');
+        res.json(lyric);
     }   
     
     });      
 });
-
-
-app.get('/api/v1/lyric/delete/:id', (req,res)=>{    
-    Lyric.remove({_id: req.params.id},(err, result)=>{  
+ 
+ 
+app.get('/api/v1/delete/:id', (req,res, next)=>{    
+   Lyric.remove({_id: req.params.id},(err, result)=>{  
         
         if(err)
     {
-        res.status(404).send('404 Error');
+       return next (err);
     } 
         
     else
     {
-        console.log(result)
+        //console.log(result)
         res.json({deleted: result.result.n});   
     }                                                                     
             });                             
     });
-
-app.get('/api/v1/lyric/:title', (req,res)=>{
+ 
+app.get('/api/v1/lyric/:title', (req,res,next)=>{
    Lyric.findOne({title: req.params.title},(err, lyric)=>{     
-   if(lyric)
+   if(err||!lyric)
    {
-        res.json(lyric);
-   }
-    else
-    {
-        res.status(404).send('404 Error');
-    }  
-        
-    });      
-});
-
-app.get('/api/v1/lyric/add/:title/:author?/:pubDate?', (req,res)=>{
-console.log(req.params);
-let author = req.params.author || "";
-let pubDate = req.params.pubDate || "";
-
-var lyric=new Lyric({title: req.params.title,author:author,pubDate: pubDate}); 
-lyric.save(lyric, (err,result)=>{        
-       
-    if(err)
-   {
-     res.status(404).send('404 Error');
-   }
-    else
-    {
-    //console.log(result);
-    res.json({added: result});
-     
+        return next(err);
     }
+    
+    else
+    {
+        res.json(lyric);
+    }   
+    
     });      
-});
-
-// api routes ends    
-
-app.get('/', (req,res)=>{
-Lyric.find({},(err, music)=>{
- if (err) return next(err);
- res.type('text/html');
-
- res.render('home',{music:JSON.stringify(music)});
 });
  
-});
-
-app.get('/about', (req,res)=>{
- res.type('text/html');
- res.render('about');
-});
-
-// send content of 'home' view, //change body to queron let result & res.render
-app.post('/get', (req,res)=>{
-     Lyric.findOne({title: req.body.title},(err, music)=>{     
-   if (err) return next(err);   
-    res.type('text/html');  
-    res.render('details', {title: req.body.title, result:music,pageheader: 'Searching for music'+req.body.title});    
-    });      
-});
-
-
-app.get('/delete', (req,res)=>{    
-    Lyric.remove({title: req.query.title},(err, music)=>{             
-    if (err) return next(err);                                  
- Lyric.count({},(err,count)=>{
-   if(err) return next(err);
-    if(count==0){  
-    res.type('text/html'); 
-    res.render('delete', {title: req.query.title, result: 'zero'});  
-    }else{   
- res.render('delete', {title: req.query.title, result: count});
+app.post('/api/v1/add/', (req,res, next) => {
+    // find & update existing item, or add new 
+    //console.log('/api/v1/add/');
+    console.log(req.body);
+    if (!req.body._id) { // insert new document        
+        let lyric = new Lyric({title:req.body.title, author: req.body.author, pubDate: req.body.pubDate});
+       lyric.save((err,newLyric) => {
+            if (err) return next(err);
+            console.log(newLyric)
+            res.json({updated: 0, _id: newLyric._id});
+        });
+    } else { // update existing document
+    console.log(req.body);
+        Lyric.updateOne({ _id: req.body._id},{title:req.body.title, author: req.body.author,pubDate: req.body.pubDate },(err, result) => {
+            if (err) return next(err);
+            res.json({updated: result.nModified, _id: req.body._id});
+        });
     }
-        })  
-            });                             
+});
+ 
+ 
+app.get('/api/v1/add/:title/:author/:pubDate', (req,res,next)=>{
+ 
+let title=req.params.title;
+Lyric.update({title: title}, {title:title, author: req.params.author, pubDate: req.params.pubDate }, {upsert: true }, (err, result) => {
+        if (err) return next(err);
+        // nModified = 0 for new item, = 1+ for updated item 
+        res.json({updated: result.nModified});
     });
-
-
-// send plain text response
-app.get('/get', (req,res)=>{
-    Lyric.findOne({title: req.query.title},(err, music)=>{     
-    if (err) return next(err);                                  
-    res.type('text/html');  
-    res.render('details', {title: req.query.title, result:music,pageheader: 'Searching for music:'+req.query.title});    
-    });      
 });
-
-
-// define 404 handler
-app.use((req,res) =>{   
- res.type('text/plain'); 
- res.status(404);
- res.send('404 - Not found');
+ 
+      
+app.use(function(req,res) {
+    res.type('text/plain'); 
+    res.status(404);
+    res.send('404 - Not found');
 });
-
+ 
 app.listen(app.get('port'), function() {
- console.log('Express started'); 
+    console.log('Express started');    
 });
+ 
+ 
 
 
 

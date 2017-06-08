@@ -48,35 +48,47 @@
         });
         this.setState({curItem: editItem});
       }
-      // Handle item delete
-      onSave(newItem){
-        let newData;
-        if (!newItem._id) {
-          newData = this.state.data;
-          newItem._id = newData.length;
-          newData.push(newItem);
-        } else {
-          newData = this.state.data.map((item) => {
-            if (item._id === newItem._id) {
-              item = newItem; 
-            }
-            return item;
-          });          
-        }
-        // Update state with new array
-        this.setState({data: newData});
+     
+          // Handle item save
+      onSave(newItem) {
+        
+        fetch("/api/v1/add/", {
+          method: "POST",
+        	headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newItem)
+        }).then(res => res.json())
+        	.then((json) => {
+        	  
+            //console.log(newItem);
+            let newData;
+            if (!newItem._id) {
+              newData = this.state.data;
+              newItem._id = json._id;
+              newData.push(newItem);
+            } else {
+              newData = this.state.data.map((item) => {
+              if (item._id === newItem._id) {
+                item = newItem; 
+              }
+              return item;
+            });          
+          }
+          // Update state with new array
+          this.setState({data: newData});
+
+        });
       }
-      
       // Handle item delete
       onDelete(id){
         
-        var url="/api/v1/lyric/delete/" +id
+        var url="/api/v1/delete/"+id;
         console.log(url);
         
         fetch(url).then((response) =>{
           return response.json();
+          
         }).then((result) =>{
-          console.log(result)
+          console.log(result);
           if (result.deleted) {
                   // Filter all items except the one to be removed
             const remainder = this.state.data.filter((item) => {
@@ -86,9 +98,16 @@
             this.setState({data: remainder});
             this.setState({curItem: {}});
           }
-        });
+        })
         
-      }
+   // Filter all items except the one to be removed
+            const remainder = this.state.data.filter((item) => {
+              return item._id !== id;
+            });
+            // Update state with new array
+            this.setState({data: remainder});
+            this.setState({curItem: {}});
+          }    
       
     onReset(){
       this.setState({curItem: {}});
@@ -140,6 +159,7 @@
         );
       }
     };
+    
     const ItemList = ({items, filter, show}) => {
       // return items that match search entry field, or all items if no entry
       const itemNodes = items.map((item) => {
@@ -173,13 +193,20 @@
       handleChange (event) {
         this.setState({[event.target.name]: event.target.value});
       };
+      
       handleSave(event) {
         // pass local state to app-level for saving to data array
         this.props.save({_id: this.state._id, title: this.state.title, author: this.state.author, pubDate: this.state.pubDate});
       };
+      
       handleDelete (event) {
         this.props.delete(this.state._id);
       };
+      
+      //handleReset (event){
+       // this.setState({_od:"",title:"",author:"",pubDate:""});
+     // };
+      
       render() {
           return (
           <div>
@@ -194,7 +221,9 @@
           );
       }
     }
+    
     ReactDOM.render(<LyricApp />, document.getElementById('root'));
+    
 </script>
 </body>
 </html>

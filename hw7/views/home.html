@@ -1,9 +1,9 @@
 
 
         
-        <h2>Music</h2>
+       <h2>Music</h2>
         
-    <h1>Search this site for Blues and Country Music</h1>    
+  <h1>Search this site for Blues and Country Music</h1>    
         
 <form method="post" action="/get">
     
@@ -17,9 +17,8 @@ Music Name:<br>
 <p>To search for music click link below.</p>
 <url>
   {{#each music}}
+ <li><a href="/get?title={{title}}">{{title}}</a></li>
   
-  <li><a href="/get?title={{title}}">{{title}}</a></li>
-  
-  {{/each}}
-</url>
+ // {{/each}}
+//</url>
     
